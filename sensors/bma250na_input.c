@@ -29,17 +29,19 @@
 #include "sensors_id.h"
 #include "sensors_config.h"
 #include "sensors_wrapper.h"
+#include "sensors_sysfs.h"
 
 #define BMA250_INPUT_NAME "bma250"
-#define NR_MAX_SIZE 4
 
 static int bma250_input_init(struct sensor_api_t *s);
 static int bma250_input_activate(struct sensor_api_t *s, int enable);
 static int bma250_input_set_delay(struct sensor_api_t *s, int64_t ns);
 static void bma250_input_close(struct sensor_api_t *s);
 static void *bma250_input_read(void *arg);
+
 struct sensor_desc {
 	struct sensors_select_t select_worker;
+	struct sensors_sysfs_t sysfs;
 	struct sensor_t sensor;
 	struct sensor_api_t api;
 	struct wrapper_entry entry;
@@ -47,7 +49,6 @@ struct sensor_desc {
 	int input_fd;
 	int current_data[3];
 	int64_t delay;
-	char nr[NR_MAX_SIZE];
 
 	/* config options */
 	int axis_x;
@@ -71,7 +72,7 @@ static struct sensor_desc bma250_input = {
 		maxRange: 156.96, /* max +/-16G */
 		resolution: 20,
 		power: 0.003,/* sleep 50ms */
-		minDelay: 10000
+		minDelay: 5000
 	},
 	.api = {
 		init: bma250_input_init,
@@ -149,15 +150,17 @@ static int bma250_input_init(struct sensor_api_t *s)
 	int fd;
 	bma250_input_read_config(d);
 
-	fd = open_input_dev_by_name_store_nr(BMA250_INPUT_NAME,
-			O_RDONLY | O_NONBLOCK, bma250_input.nr, NR_MAX_SIZE);
+	fd = open_input_dev_by_name(BMA250_INPUT_NAME, O_RDONLY | O_NONBLOCK);
 	if (fd < 0) {
 		ALOGE("%s: failed to open input dev %s, error: %s\n",
 			__func__, BMA250_INPUT_NAME, strerror(errno));
 		return -1;
 	}
 	close(fd);
+
+	sensors_sysfs_init(&d->sysfs, BMA250_INPUT_NAME, SYSFS_TYPE_INPUT_DEV);
 	sensors_select_init(&d->select_worker, bma250_input_read, s, -1);
+
 	return 0;
 }
 
@@ -168,8 +171,8 @@ static int bma250_input_activate(struct sensor_api_t *s, int enable)
 
 	/* suspend/resume will be handled in kernel-space */
 	if (enable && (fd < 0)) {
-		fd = open_input_dev_by_name_store_nr(BMA250_INPUT_NAME,
-			O_RDONLY | O_NONBLOCK, bma250_input.nr, NR_MAX_SIZE);
+		fd = open_input_dev_by_name(BMA250_INPUT_NAME,
+			O_RDONLY | O_NONBLOCK);
 		if (fd < 0) {
 			ALOGE("%s: failed to open input dev %s, error: %s\n",
 				__func__, BMA250_INPUT_NAME, strerror(errno));
@@ -188,12 +191,6 @@ static int bma250_input_set_delay(struct sensor_api_t *s, int64_t ns)
 {
 	struct sensor_desc *d = container_of(s, struct sensor_desc, api);
 	int fd = d->select_worker.get_fd(&d->select_worker);
-	const int sysfs_max = 64;
-	char sysfs_path[sysfs_max];
-	const char *path = "sys/class/input/input";
-	const int buf_max = 16;
-	char buf[buf_max];
-	int sysfs_fd, count, len;
 	int64_t usec = ns / 1000;
 
 	if (usec < d->sensor.minDelay)
@@ -201,40 +198,7 @@ static int bma250_input_set_delay(struct sensor_api_t *s, int64_t ns)
 
 	d->delay = usec * 1000;
 	d->select_worker.set_delay(&d->select_worker, d->delay);
-
-	/* rate */
-	count = snprintf(sysfs_path, sysfs_max, "%s%s/bma250_rate",
-					path, bma250_input.nr);
-	if ((count < 0) || (count >= sysfs_max))
-		goto snprintf_error;
-
-	sysfs_fd = open(sysfs_path, O_RDWR);
-	if (sysfs_fd < 0)
-		goto open_error;
-
-	count = snprintf(buf, buf_max, "%lld\n", usec / 1000);
-	if ((count < 0) || (count >= buf_max))
-		goto snprintf_error;
-
-	len = write(sysfs_fd, buf, count + 1);
-	close(sysfs_fd);
-	if (len < 0)
-		goto write_error;
-
-	return 0;
-
-snprintf_error:
-	ALOGE("%s: snprintf failed, invalid count %d\n", __func__, count);
-	return -1;
-
-open_error:
-	ALOGE("%s: open %s failed, error: %s\n", __func__, sysfs_path,
-		strerror(errno));
-	return sysfs_fd;
-
-write_error:
-	ALOGE("%s: write %s failed, error: %d\n", __func__, sysfs_path, len);
-	return len;
+	return d->sysfs.write_int(&d->sysfs, "bma250_rate", usec / 1000);
 }
 
 static void bma250_input_close(struct sensor_api_t *s)
@@ -258,12 +222,12 @@ static void *bma250_input_read(void *arg)
 
 	fd = d->select_worker.get_fd(&d->select_worker);
 
-	n = read(fd, events, sizeof(events)) / sizeof(events[0]);
+	n = read(fd, events, sizeof(events));
 	if (n < 0) {
 		ALOGE("%s: read error from fd %d, errno %d", __func__, fd, errno);
 		goto exit;
 	}
-
+	n = n / sizeof(events[0]);
 	for (i = 0; i < n; i++) {
 		e = events + i;
 		switch (e->type) {

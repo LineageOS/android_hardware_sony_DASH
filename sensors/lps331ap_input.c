@@ -27,10 +27,9 @@
 #include "sensors_select.h"
 #include "sensor_util.h"
 #include "sensors_id.h"
+#include "sensors_sysfs.h"
 
 #define LPS331AP_PRS_DEV_NAME "lps331ap_prs_sysfs"
-
-#define NR_MAX_SIZE 4
 #define NR_SAMPLES 16
 #define ROW_TO_MBAR_SCALE 4096.0
 
@@ -42,11 +41,11 @@ static void *lps331ap_input_read(void *arg);
 
 struct sensor_desc {
 	struct sensors_select_t select_worker;
+	struct sensors_sysfs_t sysfs;
 	struct sensor_t sensor;
 	struct sensor_api_t api;
 	long current_data[2];
 	int64_t delay;
-	char nr[NR_MAX_SIZE];
 	long mem[NR_SAMPLES];
 	int current_sample;
 	int num_samples;
@@ -74,15 +73,17 @@ static int lps331ap_input_init(struct sensor_api_t *s)
 	struct sensor_desc *d = container_of(s, struct sensor_desc, api);
 	int fd;
 
-	fd = open_input_dev_by_name_store_nr(LPS331AP_PRS_DEV_NAME,
-		O_RDONLY | O_NONBLOCK, lps331ap_pressure_input.nr, NR_MAX_SIZE);
+	fd = open_input_dev_by_name(LPS331AP_PRS_DEV_NAME, O_RDONLY | O_NONBLOCK);
 	if (fd < 0) {
 		ALOGE("%s: failed to open input dev %s, error: %s\n",
 			__func__, LPS331AP_PRS_DEV_NAME, strerror(errno));
 		return -1;
 	}
 	close(fd);
+
+	sensors_sysfs_init(&d->sysfs, LPS331AP_PRS_DEV_NAME, SYSFS_TYPE_INPUT_DEV);
 	sensors_select_init(&d->select_worker, lps331ap_input_read, s, -1);
+
 	return 0;
 }
 
@@ -93,9 +94,8 @@ static int lps331ap_input_activate(struct sensor_api_t *s, int enable)
 
 	/* suspend/resume will be handled in kernel-space */
 	if (enable && (fd < 0)) {
-		fd = open_input_dev_by_name_store_nr(LPS331AP_PRS_DEV_NAME,
-			O_RDONLY | O_NONBLOCK, lps331ap_pressure_input.nr,
-			NR_MAX_SIZE);
+		fd = open_input_dev_by_name(LPS331AP_PRS_DEV_NAME,
+			O_RDONLY | O_NONBLOCK);
 		if (fd < 0) {
 			ALOGE("%s: failed to open input dev %s, error: %s\n",
 				__func__, LPS331AP_PRS_DEV_NAME,
@@ -118,48 +118,11 @@ static int lps331ap_input_set_delay(struct sensor_api_t *s, int64_t ns)
 {
 	struct sensor_desc *d = container_of(s, struct sensor_desc, api);
 	int fd = d->select_worker.get_fd(&d->select_worker);
-	char sysfs_path[64];
-	const char *path = "sys/class/input/input";
-	char buf[16];
-	int sysfs_fd, count, len;
 	unsigned int ms = ns/(1000*1000);
 
 	d->delay = ns;
 
-	/* rate */
-	count = snprintf(sysfs_path, sizeof(sysfs_path),
-			"%s%s/device/poll_period_ms",
-			path, lps331ap_pressure_input.nr);
-	if ((count < 0) || (count >= (int)sizeof(sysfs_path))) {
-		ALOGE("%s: snprintf failed, invalid count %d\n",
-			__func__, count);
-		return -1;
-	}
-
-	sysfs_fd = open(sysfs_path, O_RDWR);
-	if (sysfs_fd < 0) {
-		ALOGE("%s: open %s failed, error: %s\n", __func__,
-			sysfs_path, strerror(errno));
-		return sysfs_fd;
-	}
-
-	count = snprintf(buf, sizeof(buf), "%d\n", ms);
-	if ((count < 0) || (count >= (int)sizeof(buf))) {
-		close(sysfs_fd);
-		ALOGE("%s: snprintf failed, invalid count %d\n",
-			__func__, count);
-		return -1;
-	}
-
-	len = write(sysfs_fd, buf, count + 1);
-	close(sysfs_fd);
-	if (len < 0) {
-		ALOGE("%s: write %s failed, error: %d\n", __func__,
-			sysfs_path, len);
-		return len;
-	}
-
-	return 0;
+	return d->sysfs.write_int(&d->sysfs, "device/poll_period_ms", ms);
 }
 
 static void lps331ap_input_close(struct sensor_api_t *s)
