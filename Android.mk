@@ -19,6 +19,8 @@ LOCAL_SRC_FILES += 	sensors_module.c \
 			sensors_worker.c \
 			sensors_select.c \
 			sensors_wrapper.c \
+			sensors_input_cache.c \
+			sensors_sysfs.c \
 			sensors/sensor_util.c
 
 LOCAL_CFLAGS += -I$(LOCAL_PATH)/sensors
