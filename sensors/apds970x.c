@@ -59,7 +59,7 @@ static struct sensor_desc apds970x = {
 		.version = sizeof(sensors_event_t),
 		.handle = SENSOR_PROXIMITY_HANDLE,
 		.type = SENSOR_TYPE_PROXIMITY,
-		.maxRange = 1.0,
+		.maxRange = 10.0,
 		.resolution = 1.0,
 		.power = 2
 	},
