@@ -32,6 +32,7 @@
 #define THRESH_DEFAULT   5
 #define PATH_SIZE      100
 #define UN_INIT         -1
+#define MAX_DISTANCE  10.0
 
 static int apds9700_init(struct sensor_api_t *s);
 static int apds9700_activate(struct sensor_api_t *s, int enable);
@@ -59,7 +60,7 @@ static struct sensor_desc apds970x = {
 		.version = sizeof(sensors_event_t),
 		.handle = SENSOR_PROXIMITY_HANDLE,
 		.type = SENSOR_TYPE_PROXIMITY,
-		.maxRange = 1.0,
+		.maxRange = MAX_DISTANCE,
 		.resolution = 1.0,
 		.power = 2
 	},
@@ -205,7 +206,7 @@ static void apds9700_close(struct sensor_api_t *s)
 
 static void apds9700_store_dist(struct sensor_desc *d, int value)
 {
-	d->distance = value ? 1.0 : 0.0;
+	d->distance = value ? MAX_DISTANCE : 0.0;
 	apds9700_change_threshold(d);
 }
 
