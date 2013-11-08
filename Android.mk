@@ -42,7 +42,7 @@ LOCAL_C_INCLUDES += $(yes-c-includes)
 LOCAL_STATIC_LIBRARIES += $(yes-static-libs)
 LOCAL_SHARED_LIBRARIES += $(yes-shared-libs)
 
-LOCAL_MODULE := sensors.default
+LOCAL_MODULE := sensors.$(TARGET_BOARD_PLATFORM)
 LOCAL_MODULE_TAGS := optional
 include $(BUILD_SHARED_LIBRARY)
 
