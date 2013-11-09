@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa1b9901_b756df04",
+        "filename": "Android.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 2195
+      },
+      "writtenOn": "2013-11-09T04:40:36Z",
+      "side": 1,
+      "message": "sensors.qcom will be better IMO.",
+      "revId": "e89ad9fbac0ce99f5eb793a5b886b8fb432fa4fb",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
