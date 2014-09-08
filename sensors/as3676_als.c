@@ -74,8 +74,9 @@ static int light_activate(struct sensor_api_t *s, int enable)
     struct sensor_desc *d = container_of(s, struct sensor_desc, api);
 
     if (enable) {
+#ifndef DISABLE_ALS_SWITCH
         d->sysfs.write_int(&d->sysfs, "als_on", 1);
-
+#endif
         count = snprintf(result_path, sizeof(result_path), "%s/%s",
              AS3676_DEV, "adc_als_value");
         if ((count < 0) || (count >= (int)sizeof(result_path))) {
@@ -96,7 +97,9 @@ static int light_activate(struct sensor_api_t *s, int enable)
         d->worker.suspend(&d->worker);
         close(d->fd);
         d->fd = -1;
+#ifndef DISABLE_ALS_SWITCH
         d->sysfs.write_int(&d->sysfs, "als_on", 0);
+#endif
     }
 
     return 0;
