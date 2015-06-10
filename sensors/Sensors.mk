@@ -127,6 +127,11 @@ $(SOMC_CFG_SENSORS_GYRO_L3G4200D)-files += l3g4200d_gyro.c \
 $(SOMC_CFG_SENSORS_GYRO_L3G4200D)-cflags += -DGYRO_L3G4200D_INPUT
 $(SOMC_CFG_SENSORS_GYRO_L3G4200D)-var-xyz = yes
 
+$(SOMC_CFG_SENSORS_GYRO_L3GD20)-files += l3gd20_gyro.c \
+					 wrappers/l3gd20_gyroscope.c
+$(SOMC_CFG_SENSORS_GYRO_L3GD20)-cflags += -DGYRO_L3GD20_INPUT
+$(SOMC_CFG_SENSORS_GYRO_L3GD20)-var-xyz = yes
+
 #
 # Wrapper sensors
 #
@@ -144,15 +149,28 @@ $(yes-var-compass-lsm303dlh)-c-includes += $(LOCAL_PATH)/libs/inemo \
 		$(LOCAL_PATH)/libs/inemo/lib/libSpacePointAPI_opt2_1
 endif
 
+ifeq ($(SOMC_CFG_SENSORS_GYRO_L3GD20),yes)
+$(yes-var-compass-lsm303dlh)-files += wrappers/inemo.c
+$(yes-var-compass-lsm303dlh)-static-libs += iNemoEngine
+$(yes-var-compass-lsm303dlh)-cflags += -O3 -DUSE_MMAP
+$(yes-var-compass-lsm303dlh)-c-includes += $(LOCAL_PATH)/libs/inemo \
+		$(LOCAL_PATH)/libs/inemo/lib/sensors_compass_API \
+		$(LOCAL_PATH)/libs/inemo/lib/MEMSAlgLib_eCompass \
+		$(LOCAL_PATH)/libs/inemo/lib/libSpacePointAPI_opt2_1
+endif
+
 #
 # eCompass, Magnetometer
 #
 ifneq ($(SOMC_CFG_SENSORS_GYRO_L3G4200D),yes)
+ifneq ($(SOMC_CFG_SENSORS_GYRO_L3GD20),yes)
 $(yes-var-compass-lsm303dlh)-files += wrappers/lsm303dlhx_compass.c
 $(yes-var-compass-lsm303dlh)-static-libs += libLSM303DLH
 $(yes-var-compass-lsm303dlh)-cflags += -I$(LOCAL_PATH)/libs/lsm303dlh \
 				       -DLSM303DLHC
 endif
+endif
+
 #
 # Shared files
 #
