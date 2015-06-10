@@ -2,7 +2,7 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-ifneq ($(SOMC_CFG_SENSORS_AKM8963_DUMMY),)
+ifeq ($(SOMC_CFG_SENSORS_COMPASS_AK8963),yes)
 
 LOCAL_MODULE := libsensors_akm8963
 LOCAL_MODULE_TAGS := optional
