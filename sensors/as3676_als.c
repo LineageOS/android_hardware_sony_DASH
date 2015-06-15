@@ -14,12 +14,6 @@
 #include "sensors_id.h"
 #include "sensors_sysfs.h"
 
-#ifndef ALS_PATH
-#define AS3676_DEV "/sys/devices/i2c-3/3-0040"
-#else
-#define AS3676_DEV ALS_PATH
-#endif
-
 static struct sensor_desc light_sensor;
 
 struct sensor_desc {
@@ -123,7 +117,7 @@ static struct sensor_desc light_sensor = {
 		.version = sizeof(sensors_event_t),
 		.handle = SENSOR_LIGHTSENSOR_HANDLE,
 		.type = SENSOR_TYPE_LIGHT,
-		.maxRange = LIGHT_RANGE,
+		.maxRange = ALS_CHIP_MAXRANGE,
 		.resolution = 1.0,
 		.power = 1
 	},
