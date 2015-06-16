@@ -30,7 +30,6 @@ struct sensor_desc {
 	int fd;
 };
 
-
 static void *light_poll(void *arg)
 {
 	struct sensor_desc *d = container_of(arg, struct sensor_desc, worker);
@@ -68,7 +67,6 @@ static int light_init(struct sensor_api_t *s)
 static int light_activate(struct sensor_api_t *s, int enable)
 {
 	char result_path[64];
-	int fd_enable;
 	int fd;
 	int count;
 	struct sensor_desc *d = container_of(s, struct sensor_desc, api);
