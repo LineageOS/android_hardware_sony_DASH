@@ -38,6 +38,12 @@ static void *light_poll(void *arg)
 	/*convert to lux value*/
 	lux = atof(buf)*12;
 
+#ifdef AS3677
+	/*ignore null or negative values*/
+	if (lux <= 0)
+		lux = 1;
+#endif
+
 	data.light = lux;
 	data.version = light_sensor.sensor.version;
 	data.sensor = light_sensor.sensor.handle;
@@ -53,7 +59,7 @@ static int light_init(struct sensor_api_t *s)
 	struct sensor_desc *d = container_of(s, struct sensor_desc, api);
 
 	sensors_worker_init(&d->worker, light_poll, &d->worker);
-	sensors_sysfs_init(&d->sysfs, AS3676_DEV, SYSFS_TYPE_ABS_PATH);
+	sensors_sysfs_init(&d->sysfs, ALS_PATH, SYSFS_TYPE_ABS_PATH);
 
 	return 0;
 }
@@ -69,7 +75,7 @@ static int light_activate(struct sensor_api_t *s, int enable)
 		d->sysfs.write_int(&d->sysfs, "als_on", 1);
 
 		count = snprintf(result_path, sizeof(result_path), "%s/%s",
-			 AS3676_DEV, "adc_als_value");
+			 ALS_PATH, "adc_als_value");
 		if ((count < 0) || (count >= (int)sizeof(result_path))) {
 			ALOGE("%s: snprintf failed! %d\n", __func__, count);
 			return -1;
@@ -112,7 +118,7 @@ static void light_close(struct sensor_api_t *s)
 
 static struct sensor_desc light_sensor = {
 	.sensor = {
-		.name = "AS3676 based light sensor",
+		.name = ALS_CHIP_NAME" based light sensor",
 		.vendor = "Austria Micro Systems",
 		.version = sizeof(sensors_event_t),
 		.handle = SENSOR_LIGHTSENSOR_HANDLE,
