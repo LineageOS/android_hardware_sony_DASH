@@ -45,27 +45,12 @@ static void *light_poll(void *arg)
     /*convert to lux value*/
     lux = atof(buf)*12;
 
-<<<<<<< HEAD:sensors/as3676_als.c
     data.light = lux;
     data.version = light_sensor.sensor.version;
     data.sensor = light_sensor.sensor.handle;
     data.type = light_sensor.sensor.type;
     data.timestamp = get_current_nano_time();
     sensors_fifo_put(&data);
-=======
-#ifdef AS3677
-	/*ignore null or negative values*/
-	if (lux <= 0)
-		lux = 1;
-#endif
-
-	data.light = lux;
-	data.version = light_sensor.sensor.version;
-	data.sensor = light_sensor.sensor.handle;
-	data.type = light_sensor.sensor.type;
-	data.timestamp = get_current_nano_time();
-	sensors_fifo_put(&data);
->>>>>>> 800b23b... sensors: Add support for AS3677 light sensor:sensors/as367x_als.c
 
     return NULL;
 }
@@ -74,20 +59,14 @@ static int light_init(struct sensor_api_t *s)
 {
     struct sensor_desc *d = container_of(s, struct sensor_desc, api);
 
-<<<<<<< HEAD:sensors/as3676_als.c
     sensors_worker_init(&d->worker, light_poll, &d->worker);
     sensors_sysfs_init(&d->sysfs, AS3676_DEV, SYSFS_TYPE_ABS_PATH);
-=======
-	sensors_worker_init(&d->worker, light_poll, &d->worker);
-	sensors_sysfs_init(&d->sysfs, ALS_PATH, SYSFS_TYPE_ABS_PATH);
->>>>>>> 800b23b... sensors: Add support for AS3677 light sensor:sensors/as367x_als.c
 
     return 0;
 }
 
 static int light_activate(struct sensor_api_t *s, int enable)
 {
-<<<<<<< HEAD:sensors/as3676_als.c
     char result_path[64];
     int fd_enable;
     int fd;
@@ -121,40 +100,6 @@ static int light_activate(struct sensor_api_t *s, int enable)
     }
 
     return 0;
-=======
-	char result_path[64];
-	int fd;
-	int count;
-	struct sensor_desc *d = container_of(s, struct sensor_desc, api);
-
-	if (enable) {
-		d->sysfs.write_int(&d->sysfs, "als_on", 1);
-
-		count = snprintf(result_path, sizeof(result_path), "%s/%s",
-			 ALS_PATH, "adc_als_value");
-		if ((count < 0) || (count >= (int)sizeof(result_path))) {
-			ALOGE("%s: snprintf failed! %d\n", __func__, count);
-			return -1;
-		}
-
-		fd = open(result_path, O_RDONLY);
-		if (fd < 0) {
-			ALOGE("%s: failed to open sysfs %s, error: %s\n",
-			__func__, result_path, strerror(errno));
-			return -1;
-		}
-
-		d->fd = fd;
-		d->worker.resume(&d->worker);
-	} else {
-		d->worker.suspend(&d->worker);
-		close(d->fd);
-		d->fd = -1;
-		d->sysfs.write_int(&d->sysfs, "als_on", 0);
-	}
-
-	return 0;
->>>>>>> 800b23b... sensors: Add support for AS3677 light sensor:sensors/as367x_als.c
 }
 
 static int light_set_delay(struct sensor_api_t *s, int64_t ns)
@@ -174,7 +119,6 @@ static void light_close(struct sensor_api_t *s)
 }
 
 static struct sensor_desc light_sensor = {
-<<<<<<< HEAD:sensors/as3676_als.c
     .sensor = {
         .name = "AS3676 based light sensor",
         .vendor = "Austria Micro Systems",
@@ -192,25 +136,6 @@ static struct sensor_desc light_sensor = {
         .close = light_close
     },
     .fd = -1,
-=======
-	.sensor = {
-		.name = ALS_CHIP_NAME" based light sensor",
-		.vendor = "Austria Micro Systems",
-		.version = sizeof(sensors_event_t),
-		.handle = SENSOR_LIGHTSENSOR_HANDLE,
-		.type = SENSOR_TYPE_LIGHT,
-		.maxRange = ALS_CHIP_MAXRANGE,
-		.resolution = 1.0,
-		.power = 1
-	},
-	.api = {
-		.init = light_init,
-		.activate = light_activate,
-		.set_delay = light_set_delay,
-		.close = light_close
-	},
-	.fd = -1,
->>>>>>> 800b23b... sensors: Add support for AS3677 light sensor:sensors/as367x_als.c
 };
 
 list_constructor(light_init_driver);
@@ -218,4 +143,3 @@ void light_init_driver()
 {
     (void)sensors_list_register(&light_sensor.sensor, &light_sensor.api);
 }
-
