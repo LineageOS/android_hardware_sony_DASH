@@ -16,7 +16,9 @@
 
 #define LOG_TAG "DASH"
 
+#include <errno.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include "sensors_log.h"
