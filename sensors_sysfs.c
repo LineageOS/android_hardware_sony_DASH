@@ -16,6 +16,7 @@
 
 #define LOG_TAG "DASH"
 
+#include <errno.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <fcntl.h>
