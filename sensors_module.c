@@ -67,6 +67,50 @@ static int sensors_module_poll(struct sensors_poll_device_t *dev,
 	return ret;
 }
 
+static int sensors_module_batch(struct sensors_poll_device_1 *dev,
+				    int handle, int flags, int64_t ns, int64_t timeout)
+{
+	int ret;
+	struct sensor_api_t* api = sensors_list_get_api_from_handle(handle);
+
+	if (!api) {
+		ALOGE("%s: unable to find handle!", __func__);
+		return -1;
+	}
+
+	switch (sensors_list_get_type_from_handle(handle)) {
+		case -1:
+			ALOGE("%s: unable to find type!", __func__);
+			return -1;
+
+		case SENSOR_TYPE_PROXIMITY:
+			return 0;
+
+		default:
+			/*
+			 * NOTE: the kernel drivers currently don't support batching,
+			 ** so using setDelay() (now deprecated) is enough.
+			 **/
+			ret = api->set_delay(api, ns);
+			break;
+	}
+
+	return ret;
+}
+
+static int sensors_module_flush(sensors_poll_device_1_t *dev,
+			       int handle)
+{
+	struct sensor_api_t* api = sensors_list_get_api_from_handle(handle);
+
+	if (!api) {
+		ALOGE("%s: unable to find handle!", __func__);
+		return -1;
+	}
+
+	return -EINVAL;
+}
+
 static int sensors_module_close(struct hw_device_t* device)
 {
 	sensors_fifo_deinit();
@@ -82,7 +126,7 @@ static int sensors_init_iterator(struct sensor_api_t* api, void *arg)
 
 static int sensors_module_open(const struct hw_module_t* module, const char* id, struct hw_device_t** device)
 {
-	struct sensors_poll_device_t *dev;
+	sensors_poll_device_1_t *dev;
 
 	if (strcmp(id, SENSORS_HARDWARE_POLL))
 		return 0;
@@ -93,12 +137,14 @@ static int sensors_module_open(const struct hw_module_t* module, const char* id,
 
 	memset(dev, 0, sizeof(*dev));
 	dev->common.tag = HARDWARE_DEVICE_TAG;
-	dev->common.version = 0;
+	dev->common.version = SENSORS_DEVICE_API_VERSION_1_3;
 	dev->common.module = (struct hw_module_t*)module;
 	dev->common.close = sensors_module_close;
 	dev->activate = sensors_module_activate;
 	dev->setDelay = sensors_module_set_delay;
 	dev->poll = sensors_module_poll;
+	dev->batch = sensors_module_batch;
+	dev->flush = sensors_module_flush;
 
 	*device = (struct hw_device_t*) dev;
 
