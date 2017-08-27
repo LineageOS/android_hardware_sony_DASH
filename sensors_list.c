@@ -22,12 +22,16 @@
 
 #define DASH_MAX_SENSORS 16
 
+#define UNUSED_PARAM(param) ((void)(param))
+
 static struct sensor_t sensors[DASH_MAX_SENSORS];
 static struct sensor_api_t* sensor_apis[DASH_MAX_SENSORS];
 static int number_of_sensors = 0;
 
 int sensors_list_get(struct sensors_module_t* module, struct sensor_t const** plist)
 {
+	UNUSED_PARAM(module);
+
 	*plist = sensors;
 	return number_of_sensors;
 }

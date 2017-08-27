@@ -78,13 +78,13 @@ static struct sensor_desc bma250_input = {
 		maxRange: 156.96, /* max +/-16G */
 		resolution: 20,
 		power: 0.003,/* sleep 50ms */
-		minDelay: 5000
+		.minDelay = 5000,
 	},
 	.api = {
 		init: bma250_input_init,
 		activate: bma250_input_activate,
 		set_delay: bma250_input_fw_delay,
-		close: bma250_input_close
+		.close = bma250_input_close,
 	},
 	.input_fd = -1,
 	.axis_x = 0,

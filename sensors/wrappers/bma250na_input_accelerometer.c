@@ -35,15 +35,15 @@ static void bma250_data(struct sensor_api_t *s, struct sensor_data_t *sd);
 
 static struct wrapper_desc bma250_input = {
 	.sensor = {
-		name: "BMA250 accelerometer",
-		vendor: "Bosch Sensortec GmbH",
-		version: sizeof(sensors_event_t),
-		handle: SENSOR_ACCELEROMETER_HANDLE,
-		type: SENSOR_TYPE_ACCELEROMETER,
-		maxRange: 156.96, /* max +/-16G */
-		resolution: 20,
-		power: 0.003,/* sleep 50ms */
-		minDelay: 5000
+		.name = "BMA250 accelerometer",
+		.vendor = "Bosch Sensortec GmbH",
+		.version = sizeof(sensors_event_t),
+		.handle = SENSOR_ACCELEROMETER_HANDLE,
+		.type = SENSOR_TYPE_ACCELEROMETER,
+		.maxRange = 156.96, /* max +/-16G */
+		.resolution = 20,
+		.power = 0.003,/* sleep 50ms */
+		.minDelay = 5000,
 	},
 	.api = {
 		.init = sensors_wrapper_init,
