@@ -59,12 +59,12 @@ static struct sensor_desc lps331ap_pressure_input = {
 		type : SENSOR_TYPE_PRESSURE,
 		maxRange : 1100.00, /* hecto pascal */
 		resolution : 0.01, /* hecto pascal */
-		power : 0.012 /* mA per sample at ultra high resolution */
+		.power = 0.012, /* mA per sample at ultra high resolution */
 	},
 	.api = { init: lps331ap_input_init,
 		activate : lps331ap_input_activate,
 		set_delay : lps331ap_input_set_delay,
-		close : lps331ap_input_close
+		.close = lps331ap_input_close,
 	},
 };
 
