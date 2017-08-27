@@ -69,21 +69,21 @@ struct sensor_desc {
 
 static struct sensor_desc bma150_input = {
 	.sensor = {
-		name: "BMA150 accelerometer",
-		vendor: "Bosch Sensortec GmbH",
-		version: sizeof(sensors_event_t),
-		handle: SENSOR_ACCELEROMETER_HANDLE,
-		type: SENSOR_TYPE_ACCELEROMETER,
-		maxRange: 9.81,
-		resolution: 20,
-		power: 0.13,
-		minDelay: 5000
+		.name = "BMA150 accelerometer",
+		.vendor = "Bosch Sensortec GmbH",
+		.version = sizeof(sensors_event_t),
+		.handle = SENSOR_ACCELEROMETER_HANDLE,
+		.type = SENSOR_TYPE_ACCELEROMETER,
+		.maxRange = 9.81,
+		.resolution = 20,
+		.power = 0.13,
+		.minDelay = 5000,
 	},
 	.api = {
-		init: bma150_input_init,
-		activate: bma150_input_activate,
-		set_delay: bma150_input_fw_delay,
-		close: bma150_input_close
+		.init = bma150_input_init,
+		.activate = bma150_input_activate,
+		.set_delay = bma150_input_fw_delay,
+		.close = bma150_input_close,
 	},
 	.input_fd = -1,
 	.axis_x = 0,

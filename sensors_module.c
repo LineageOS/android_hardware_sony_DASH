@@ -24,9 +24,13 @@
 #include "sensors_config.h"
 #include "sensors_fifo.h"
 
+#define UNUSED_PARAM(param) ((void)(param))
+
 static int sensors_module_set_delay(struct sensors_poll_device_t *dev,
 				    int handle, int64_t ns)
 {
+	UNUSED_PARAM(dev);
+
 	int ret;
 	struct sensor_api_t* api = sensors_list_get_api_from_handle(handle);
 
@@ -43,6 +47,8 @@ static int sensors_module_set_delay(struct sensors_poll_device_t *dev,
 static int sensors_module_activate(struct sensors_poll_device_t *dev,
 				   int handle, int enabled)
 {
+	UNUSED_PARAM(dev);
+
 	struct sensor_api_t* api = sensors_list_get_api_from_handle(handle);
 
 	if (!api) {
@@ -59,6 +65,8 @@ static int sensors_module_activate(struct sensors_poll_device_t *dev,
 static int sensors_module_poll(struct sensors_poll_device_t *dev,
 			       sensors_event_t* data, int count)
 {
+	UNUSED_PARAM(dev);
+
 	int ret;
 
 	while ((ret = sensors_fifo_get_all(data, count)) == 0)
@@ -70,6 +78,10 @@ static int sensors_module_poll(struct sensors_poll_device_t *dev,
 static int sensors_module_batch(struct sensors_poll_device_1 *dev,
 				    int handle, int flags, int64_t ns, int64_t timeout)
 {
+	UNUSED_PARAM(dev);
+	UNUSED_PARAM(flags);
+	UNUSED_PARAM(timeout);
+
 	int ret;
 	struct sensor_api_t* api = sensors_list_get_api_from_handle(handle);
 
@@ -101,6 +113,8 @@ static int sensors_module_batch(struct sensors_poll_device_1 *dev,
 static int sensors_module_flush(sensors_poll_device_1_t *dev,
 			       int handle)
 {
+	UNUSED_PARAM(dev);
+
 	struct sensor_api_t* api = sensors_list_get_api_from_handle(handle);
 
 	if (!api) {
@@ -121,6 +135,8 @@ static int sensors_module_close(struct hw_device_t* device)
 
 static int sensors_init_iterator(struct sensor_api_t* api, void *arg)
 {
+	UNUSED_PARAM(arg);
+
 	return api->init(api);
 }
 
@@ -156,19 +172,19 @@ static int sensors_module_open(const struct hw_module_t* module, const char* id,
 }
 
 struct hw_module_methods_t sensors_module_methods = {
-	open: sensors_module_open
+	.open = sensors_module_open,
 };
 
 struct sensors_module_t HAL_MODULE_INFO_SYM = {
-	common: {
-		tag: HARDWARE_MODULE_TAG,
-		version_major: 1,
-		version_minor: 0,
-		id: SENSORS_HARDWARE_MODULE_ID,
-		name : "dash",
-		author : "oskar.andero@sonymobile.com",
-		methods: &sensors_module_methods,
+	.common = {
+		.tag = HARDWARE_MODULE_TAG,
+		.version_major = 1,
+		.version_minor = 0,
+		.id = SENSORS_HARDWARE_MODULE_ID,
+		.name = "dash",
+		.author = "oskar.andero@sonymobile.com",
+		.methods = &sensors_module_methods,
 	},
-	get_sensors_list: sensors_list_get
+	.get_sensors_list = sensors_list_get,
 };
 

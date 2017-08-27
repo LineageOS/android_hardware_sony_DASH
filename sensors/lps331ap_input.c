@@ -52,19 +52,21 @@ struct sensor_desc {
 };
 
 static struct sensor_desc lps331ap_pressure_input = {
-	.sensor = { name: "LPS331AP Pressure",
-		vendor : "STMicroelectronics",
-		version : sizeof(sensors_event_t),
-		handle : SENSOR_PRESSURE_HANDLE,
-		type : SENSOR_TYPE_PRESSURE,
-		maxRange : 1100.00, /* hecto pascal */
-		resolution : 0.01, /* hecto pascal */
-		power : 0.012 /* mA per sample at ultra high resolution */
+	.sensor = {
+		.name = "LPS331AP Pressure",
+		.vendor = "STMicroelectronics",
+		.version = sizeof(sensors_event_t),
+		.handle = SENSOR_PRESSURE_HANDLE,
+		.type = SENSOR_TYPE_PRESSURE,
+		.maxRange = 1100.00, /* hecto pascal */
+		.resolution = 0.01, /* hecto pascal */
+		.power = 0.012, /* mA per sample at ultra high resolution */
 	},
-	.api = { init: lps331ap_input_init,
-		activate : lps331ap_input_activate,
-		set_delay : lps331ap_input_set_delay,
-		close : lps331ap_input_close
+	.api = {
+		.init = lps331ap_input_init,
+		.activate = lps331ap_input_activate,
+		.set_delay = lps331ap_input_set_delay,
+		.close = lps331ap_input_close,
 	},
 };
 

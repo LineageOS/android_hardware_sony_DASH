@@ -14,8 +14,6 @@
 #include "sensors_id.h"
 #include "sensors_sysfs.h"
 
-static struct sensor_desc light_sensor;
-
 struct sensor_desc {
 	struct sensors_worker_t worker;
 	struct sensors_sysfs_t sysfs;
@@ -23,6 +21,8 @@ struct sensor_desc {
 	struct sensor_api_t api;
 	int fd;
 };
+
+static struct sensor_desc light_sensor;
 
 static void *light_poll(void *arg)
 {

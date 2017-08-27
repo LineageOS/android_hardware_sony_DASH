@@ -30,6 +30,7 @@
 #define DUMMY_DATA "1"
 #define PATH_SIZE 44
 #define DEV_NAME "compass"
+#undef PHYS_PATH_BASE
 #define PHYS_PATH_BASE "/sys/devices/virtual/input"
 
 #define TO_STRING_(x) #x
@@ -217,21 +218,21 @@ exit:
 
 static struct sensor_desc ak896xna_magnetic = {
 	.sensor = {
-		name: AKM_CHIP_NAME" Magnetic Field",
-		vendor: "Asahi Kasei Corp.",
-		version: sizeof(sensors_event_t),
-		handle: SENSOR_MAGNETIC_FIELD_HANDLE,
-		type: SENSOR_TYPE_MAGNETIC_FIELD,
-		maxRange: AKM_CHIP_MAXRANGE,
-		resolution: AKM_CHIP_RESOLUTION,
-		power: AKM_CHIP_POWER,
-		minDelay: 5000,
+		.name = AKM_CHIP_NAME" Magnetic Field",
+		.vendor = "Asahi Kasei Corp.",
+		.version = sizeof(sensors_event_t),
+		.handle = SENSOR_MAGNETIC_FIELD_HANDLE,
+		.type = SENSOR_TYPE_MAGNETIC_FIELD,
+		.maxRange = AKM_CHIP_MAXRANGE,
+		.resolution = AKM_CHIP_RESOLUTION,
+		.power = AKM_CHIP_POWER,
+		.minDelay = 5000,
 	},
 	.api = {
-		init: ak896x_init,
-		activate: ak896x_activate,
-		set_delay: ak896x_set_delay,
-		close: ak896x_close,
+		.init = ak896x_init,
+		.activate = ak896x_activate,
+		.set_delay = ak896x_set_delay,
+		.close = ak896x_close,
 	},
 	.map_prefix = "ak896xmagnetic",
 	.input_name = "compass",

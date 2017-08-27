@@ -83,7 +83,7 @@ static int64_t list_get_rate(int sensor)
 
 	for (j = 0; j < list[sensor].entry->nr; j++) {
 		if ((list[sensor].entry->rate[j] >= 0) &&
-			(list[sensor].entry->rate[j] < (uint64_t)rate))
+				(rate == NO_RATE || list[sensor].entry->rate[j] < rate))
 			rate = list[sensor].entry->rate[j];
 	}
 

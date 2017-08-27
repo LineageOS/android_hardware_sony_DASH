@@ -48,20 +48,20 @@ struct sensor_desc {
 
 static struct sensor_desc bmp180_pressure_input = {
 	.sensor = {
-		name: "BMP180 Pressure",
-		vendor: "Bosch Sensortec GmbH",
-		version: sizeof(sensors_event_t),
-		handle: SENSOR_PRESSURE_HANDLE,
-		type: SENSOR_TYPE_PRESSURE,
-		maxRange: 1100.00, /* hecto pascal */
-		resolution: 0.01, /* hecto pascal */
-		power: 0.012 /* mA per sample at ultra high resolution */
+		.name = "BMP180 Pressure",
+		.vendor = "Bosch Sensortec GmbH",
+		.version = sizeof(sensors_event_t),
+		.handle = SENSOR_PRESSURE_HANDLE,
+		.type = SENSOR_TYPE_PRESSURE,
+		.maxRange = 1100.00, /* hecto pascal */
+		.resolution = 0.01, /* hecto pascal */
+		.power = 0.012, /* mA per sample at ultra high resolution */
 	},
 	.api = {
-		init: bmp180_input_init,
-		activate: bmp180_input_activate,
-		set_delay: bmp180_input_set_delay,
-		close: bmp180_input_close
+		.init = bmp180_input_init,
+		.activate = bmp180_input_activate,
+		.set_delay = bmp180_input_set_delay,
+		.close = bmp180_input_close,
 	},
 };
 
