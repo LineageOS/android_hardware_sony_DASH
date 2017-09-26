@@ -53,7 +53,7 @@ static int light_init(struct sensor_api_t *s)
 	struct sensor_desc *d = container_of(s, struct sensor_desc, api);
 
 	sensors_worker_init(&d->worker, light_poll, &d->worker);
-	sensors_sysfs_init(&d->sysfs, LM3533_DEV, SYSFS_TYPE_ABS_PATH);
+	sensors_sysfs_init(&d->sysfs, ALS_PATH, SYSFS_TYPE_ABS_PATH);
 
 	return 0;
 }
@@ -69,7 +69,7 @@ static int light_activate(struct sensor_api_t *s, int enable)
 		d->sysfs.write_int(&d->sysfs, "als_enable", 1);
 
 		count = snprintf(result_path, sizeof(result_path), "%s/%s",
-			 LM3533_DEV, "als_result");
+			 ALS_PATH, "als_result");
 		if ((count < 0) || (count >= (int)sizeof(result_path))) {
 			ALOGE("%s: snprintf failed! %d\n", __func__, count);
 			return -1;
