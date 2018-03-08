@@ -385,18 +385,13 @@ static void ak896x_close(struct sensor_api_t *s)
 	}
 }
 
-static int ak896x_form(void)
-{
-	/* TODO: implement form factor */
-	return AKM_ChangeFormFactor(0);
-}
-
 static void ak896xna_compass_data(struct sensor_api_t *s, struct sensor_data_t *sd)
 {
-	struct wrapper_desc *d = container_of(s, struct wrapper_desc, api);
 	sensors_event_t data;
 	int err;
 	unsigned int cal;
+
+	(void)s;
 
 	memset(&data, 0, sizeof(data));
 

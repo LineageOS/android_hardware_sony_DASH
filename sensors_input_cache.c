@@ -56,7 +56,6 @@ const struct sensors_input_cache_entry_t *sensors_input_cache_get(
 	int fd;
 	DIR *dir;
 	struct dirent * item;
-	struct list_node *member;
 	struct input_dev_list *temp;
 	pthread_t id[MAX_EVENT_DRIVERS];
 	unsigned int i = 0;

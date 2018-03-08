@@ -67,12 +67,6 @@ static int ak896x_set_delay(struct sensor_api_t *s, int64_t ns)
 	return 0;
 }
 
-static int ak896x_singleshot(struct sensor_desc *d)
-{
-	return d->sysfs.write(&d->sysfs, "single", DUMMY_DATA,
-			      strlen(DUMMY_DATA));
-}
-
 static int ak896x_set_interval(struct sensor_desc *d, int interval)
 {
 	if (interval > AKM_MAX_INTERVAL) {
@@ -158,12 +152,6 @@ static int ak896x_activate(struct sensor_api_t *s, int enable)
 
 exit:
 	return ret;
-}
-
-static int ak896x_form(void)
-{
-	/* TODO: implement form factor */
-	return AKM_ChangeFormFactor(0);
 }
 
 static void *ak896x_read(void *arg)
