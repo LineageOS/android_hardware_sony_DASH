@@ -3,6 +3,7 @@
 #include <sys/ioctl.h>
 #include <dirent.h>
 #include <pthread.h>
+#include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
