@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d3ccde44_c03c8b06",
+        "filename": "sensors/wrappers/ak896xna_sensors.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 10067
+      },
+      "writtenOn": "2018-03-10T11:46:37Z",
+      "side": 1,
+      "message": "__unused struct sensor_api_t *s?",
+      "range": {
+        "startLine": 388,
+        "startChar": 34,
+        "endLine": 388,
+        "endChar": 56
+      },
+      "revId": "dbc459dd82dd8a7161eb94e98acc95b505465f07",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
